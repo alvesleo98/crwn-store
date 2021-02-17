@@ -12,6 +12,8 @@ const config = {
     appId: "1:198558451548:web:84ee08d8229b8ea829a399"
 };
  
+firebase.initializeApp(config);
+
 //função que extrai dados do usuario autenticado via google e salva no bd
 export const createUserProfileDocument = async (userAuth, other_data) => {
     if(!userAuth) return;
@@ -44,7 +46,38 @@ export const createUserProfileDocument = async (userAuth, other_data) => {
     return userRef;
 };
 
-firebase.initializeApp(config);
+//cria a referencia collections e adicionar os produtos no bd
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
+    const collectionRef = firestore.collection(collectionKey);
+    
+    //objeto que agrupa todos os itens e adiciona ao bd numa requisição só
+    const batch = firestore.batch();
+    
+    objectsToAdd.forEach(obj =>{
+        const newDocRef = collectionRef.doc();
+        batch.set(newDocRef, obj);
+    });
+
+    return await batch.commit();
+}
+
+export const convertCollectionsSnapshotToMap = (collections) => {
+    const transformedCollections = collections.docs.map(doc =>{
+        const { title, items } = doc.data();
+
+        return {
+            id: doc.id,
+            routeName: encodeURI(title.toLowerCase()),
+            title,
+            items
+        }
+    });
+    
+    return transformedCollections.reduce((accumulator, collection) =>{
+        accumulator[collection.title.toLowerCase()] = collection;
+        return accumulator;
+    }, {});
+}
 
 //auth sera necessario quando for realizar operações que necessitam de autenticação
 export const auth = firebase.auth();

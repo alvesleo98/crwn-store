@@ -35,7 +35,7 @@ const CheckoutPage = ({ cartItems, total }) => (
         }
         <div className='total'>
             <span>TOTAL: R${total}</span>
-            <div class='test-warning'>
+            <div className='test-warning'>
                 *Cartao de Credito para teste*
                 <br/>
                 4242 4242 4242 4242 - Exp: 01/23 - CVV: 123
